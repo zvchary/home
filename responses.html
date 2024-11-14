@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Responses</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Azeret+Mono:ital,wght@0,900;1,900&family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            font-family: "IBM Plex Mono", monospace;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            justify-content: flex-start;
+            overflow: hidden;
+            padding: 10px;
+        }
+
+        h1 {
+            font-weight: 500;
+            text-align: center;
+            width: flex;
+            max-width: 80%;
+        }
+
+        button {
+            font-family: "IBM Plex Mono", monospace;
+            margin-top: 20px;
+        }
+
+        .response-container { 
+            white-space: pre-wrap;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .draggable-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Grid with dynamic column size */
+            gap: 10px;
+            justify-items: center;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 80%;
+        }
+
+        .draggable-box {
+            padding: 10px 20px;
+            background-color: #ffffff;
+            border-width: 1.5px;
+            border-right-color: rgb(97, 97, 97);
+            border-bottom-color: rgb(97, 97, 97);
+            border-top-color: rgb(225, 225, 225);
+            border-left-color: rgb(247, 247, 247);
+            border-style: solid;
+            color: red;
+            font-weight: 500;
+            cursor: move;
+            user-select: none;
+            z-index: 1;
+            text-align: center;
+            position: relative; /* Boxes start within the grid layout */
+        }
+        
+        /* Optionally hide the response string */
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="response-container hidden" id="responseString"></div><br> <!-- Add 'hidden' class here -->
+    <div class="draggable-container" id="draggableContainer"></div><br>
+    <button onclick="clearResponses()">Start Over</button>
+
+    <script>
+        // Retrieve stored responses from localStorage using the correct keys
+        const name = localStorage.getItem('name'); 
+        const color = localStorage.getItem('color'); 
+        const hobby = localStorage.getItem('hobby'); 
+        const userLocation = localStorage.getItem('location'); 
+
+        // Check if all responses exist
+        if (name && color && hobby && userLocation) {
+            // Combine all responses into a single string
+            const responseString = `${name} ${color} ${hobby} ${userLocation}`;
+
+            // You can hide the response string by default by adding the 'hidden' class
+            //document.getElementById('responseString').textContent = responseString;
+
+            // Split the response string into individual words
+            const words = responseString.split(' ');
+
+            // Get the container for the draggable boxes
+            const draggableContainer = document.getElementById('draggableContainer');
+
+            // Create a draggable box for each word
+            words.forEach(word => {
+                const wordBox = document.createElement('div');
+                wordBox.classList.add('draggable-box');
+                wordBox.textContent = word;
+
+                // Append the word box to the container
+                draggableContainer.appendChild(wordBox);
+
+                // Add drag events
+                wordBox.addEventListener('mousedown', (e) => startDrag(e, wordBox));
+            });
+
+        } else {
+            document.getElementById('responseString').textContent = 'Responses not found. Please complete the form.';
+        }
+
+        // Dragging variables
+        let isDragging = false;
+        let currentBox = null;
+        let offsetX = 0;
+        let offsetY = 0;
+
+        // Function to start the drag
+        function startDrag(e, box) {
+            isDragging = true;
+            currentBox = box;
+            offsetX = e.clientX - box.getBoundingClientRect().left;  // Calculate mouse offset
+            offsetY = e.clientY - box.getBoundingClientRect().top;  // Calculate mouse offset
+
+            // Set absolute positioning to allow dragging
+            box.style.position = 'absolute';  
+            box.style.opacity = '0.5'; // Visual feedback while dragging
+
+            // Add mousemove and mouseup events
+            document.addEventListener('mousemove', onDragMove);
+            document.addEventListener('mouseup', onDragEnd);
+        }
+
+        // Function to move the box during drag
+        function onDragMove(e) {
+            if (isDragging && currentBox) {
+                // Update the position of the box
+                const newX = e.clientX - offsetX;
+                const newY = e.clientY - offsetY;
+                currentBox.style.left = `${newX}px`;
+                currentBox.style.top = `${newY}px`;
+            }
+        }
+
+        // Function to stop dragging
+        function onDragEnd() {
+            if (isDragging) {
+                isDragging = false;
+                currentBox.style.opacity = '1'; // Reset opacity after dragging ends
+                document.removeEventListener('mousemove', onDragMove);
+                document.removeEventListener('mouseup', onDragEnd);
+            }
+        }
+
+        // Clear localStorage and restart
+        function clearResponses() {
+            localStorage.clear(); // Clear the stored responses
+            window.location.href = 'index.html'; // Redirect to the first page
+        }
+    </script>
+</body>
+</html>
