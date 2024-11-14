@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Responses</title>
+    <title>Responses</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Azeret+Mono:ital,wght@0,900;1,900&family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
 
@@ -26,6 +26,7 @@
 
         h1 {
             font-weight: 500;
+            font-size: 2.5vh;
             text-align: center;
             width: flex;
             max-width: 80%;
@@ -53,7 +54,7 @@
         }
 
         .draggable-box {
-            padding: 10px 20px;
+            padding: 10px 15px;
             background-color: #ffffff;
             border-width: 1.5px;
             border-right-color: rgb(97, 97, 97);
@@ -63,6 +64,7 @@
             border-style: solid;
             color: red;
             font-weight: 500;
+            font-size: 2vh;
             cursor: move;
             user-select: none;
             z-index: 1;
@@ -77,9 +79,11 @@
     </style>
 </head>
 <body>
+    <br><h1>What new forms and ideas can you arrange with these thoughts?</h1>
+    <button onclick="clearResponses()">&nbsp;Start Over&nbsp;</button>
     <div class="response-container hidden" id="responseString"></div><br> <!-- Add 'hidden' class here -->
     <div class="draggable-container" id="draggableContainer"></div><br>
-    <button onclick="clearResponses()">Start Over</button>
+    
 
     <script>
         // Retrieve stored responses from localStorage using the correct keys
@@ -165,7 +169,7 @@
         // Clear localStorage and restart
         function clearResponses() {
             localStorage.clear(); // Clear the stored responses
-            window.location.href = 'index.html'; // Redirect to the first page
+            window.location.href = 'page1.html'; // Redirect to the first page
         }
     </script>
 </body>
