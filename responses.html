@@ -97,9 +97,6 @@
             // Combine all responses into a single string
             const responseString = `${name} ${color} ${hobby} ${userLocation}`;
 
-            // You can hide the response string by default by adding the 'hidden' class
-            //document.getElementById('responseString').textContent = responseString;
-
             // Split the response string into individual words
             const words = responseString.split(' ');
 
@@ -115,8 +112,8 @@
                 // Append the word box to the container
                 draggableContainer.appendChild(wordBox);
 
-                // Add drag events
-                wordBox.addEventListener('mousedown', (e) => startDrag(e, wordBox));
+                // Add mouse and touch drag events
+                addDragEvents(wordBox);
             });
 
         } else {
@@ -129,41 +126,70 @@
         let offsetX = 0;
         let offsetY = 0;
 
-        // Function to start the drag
+        // Function to start the drag (for both mouse and touch)
         function startDrag(e, box) {
             isDragging = true;
             currentBox = box;
-            offsetX = e.clientX - box.getBoundingClientRect().left;  // Calculate mouse offset
-            offsetY = e.clientY - box.getBoundingClientRect().top;  // Calculate mouse offset
+            // Check if it's a mouse or touch event
+            if (e.type === "mousedown") {
+                offsetX = e.clientX - box.getBoundingClientRect().left;
+                offsetY = e.clientY - box.getBoundingClientRect().top;
+            } else if (e.type === "touchstart") {
+                offsetX = e.touches[0].clientX - box.getBoundingClientRect().left;
+                offsetY = e.touches[0].clientY - box.getBoundingClientRect().top;
+            }
 
             // Set absolute positioning to allow dragging
-            box.style.position = 'absolute';  
+            box.style.position = 'absolute';
             box.style.opacity = '0.5'; // Visual feedback while dragging
 
-            // Add mousemove and mouseup events
-            document.addEventListener('mousemove', onDragMove);
-            document.addEventListener('mouseup', onDragEnd);
+            // Add move and end events for both mouse and touch
+            if (e.type === "mousedown") {
+                document.addEventListener('mousemove', onDragMove);
+                document.addEventListener('mouseup', onDragEnd);
+            } else if (e.type === "touchstart") {
+                document.addEventListener('touchmove', onDragMove);
+                document.addEventListener('touchend', onDragEnd);
+            }
         }
 
-        // Function to move the box during drag
+        // Function to move the box during drag (for both mouse and touch)
         function onDragMove(e) {
             if (isDragging && currentBox) {
-                // Update the position of the box
-                const newX = e.clientX - offsetX;
-                const newY = e.clientY - offsetY;
+                let newX, newY;
+                if (e.type === "mousemove") {
+                    newX = e.clientX - offsetX;
+                    newY = e.clientY - offsetY;
+                } else if (e.type === "touchmove") {
+                    newX = e.touches[0].clientX - offsetX;
+                    newY = e.touches[0].clientY - offsetY;
+                }
                 currentBox.style.left = `${newX}px`;
                 currentBox.style.top = `${newY}px`;
             }
         }
 
-        // Function to stop dragging
-        function onDragEnd() {
+        // Function to stop dragging (for both mouse and touch)
+        function onDragEnd(e) {
             if (isDragging) {
                 isDragging = false;
                 currentBox.style.opacity = '1'; // Reset opacity after dragging ends
-                document.removeEventListener('mousemove', onDragMove);
-                document.removeEventListener('mouseup', onDragEnd);
+
+                // Remove the event listeners
+                if (e.type === "mouseup") {
+                    document.removeEventListener('mousemove', onDragMove);
+                    document.removeEventListener('mouseup', onDragEnd);
+                } else if (e.type === "touchend") {
+                    document.removeEventListener('touchmove', onDragMove);
+                    document.removeEventListener('touchend', onDragEnd);
+                }
             }
+        }
+
+        // Add drag events for both mouse and touch
+        function addDragEvents(wordBox) {
+            wordBox.addEventListener('mousedown', (e) => startDrag(e, wordBox));
+            wordBox.addEventListener('touchstart', (e) => startDrag(e, wordBox));
         }
 
         // Clear localStorage and restart
